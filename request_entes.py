@@ -1,10 +1,11 @@
 import requests
 import csv
+from classes import CsvWriter
 
-url = "http://apidatalake.tesouro.gov.br/ords/siconfi/tt/entes"
+URL = "http://apidatalake.tesouro.gov.br/ords/siconfi/tt/entes"
 
 # Make a GET request to the API endpoint
-response = requests.get(url)
+response = requests.get(URL)
 
 # Check if the request was successful (status code 200)
 if response.status_code == 200:
@@ -15,21 +16,12 @@ if response.status_code == 200:
     if 'items' in data and data['items']:
         # Extract field names from the first item
         field_names = list(data['items'][0].keys())
-
+        data = data['items']
         # Define the path to the CSV file
-        csv_file_path = "api_data.csv"
+        csv_file_path = "api_data"
 
-        # Write data to CSV file
-        with open(csv_file_path, mode='w', newline='') as file:
-            writer = csv.DictWriter(file, fieldnames=field_names)
+        CsvWriter(data, field_names).export_data_to_file(csv_file_path)
 
-            # Write the header
-            writer.writeheader()
-
-            # Write all data rows
-            writer.writerows(data['items'])
-
-        print("Data has been saved to", csv_file_path)
     else:
         print("No data found in the response.")
 else:
