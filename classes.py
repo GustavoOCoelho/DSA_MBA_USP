@@ -1,24 +1,34 @@
 import csv
+from abc import ABC, abstractmethod
 
-class FileExporter:
-    def __init__(self,file_path = None):
-        if file_path == None:
-            self.file_path = input("Which path do you want to export your file to: ")
-        else:
-            self.file_path = file_path
 
-    def export_data(self, data, header):
-        try:
-            with open(self.file_path, 'w', newline='') as file:
-                writer = csv.DictWriter(file, fieldnames=header)
+class FileWriter(ABC):
+    @property
+    @abstractmethod
+    def file_extension(self):
+        pass
 
-                # Write the header
-                writer.writeheader()
+    @abstractmethod
+    def _write(self, file):
+        pass
 
-                # Write all data rows
-                writer.writerows(data)
-            print("Data sucessfully exported to:", self.file_path)
-        except Exception as e:
-            print("Error exporting data:", e)
+    def export_data_to_file(self, file_name):
+        with open(f"{file_name}.{self.file_extension}", 'w', newline='') as file:
+            self._write(file)
+
+
+class CsvWriter(FileWriter):
+    def __init__(self, data, header=None):
+        self._data = data
+        self._header = header
+
+    def file_extension(self):
+        return 'csv'
+
+    def _write(self, file):
+        writer = csv.DictWriter(file, fieldnames=self._header)
+        writer.writeheader()
+        writer.writerows(self._data)
+
 
 
