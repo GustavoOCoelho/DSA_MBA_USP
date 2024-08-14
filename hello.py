@@ -1,5 +1,5 @@
 
-from service.client import url
+# from service.client import url
 import pandas as pd
 
 msg = 'Roll a dice'
